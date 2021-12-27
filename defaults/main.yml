@@ -1,0 +1,9 @@
+---
+vif_user: vif
+vif_group: vif
+vif_log_dir: /var/log/vif
+vif_db_dir: "{{ __vif_db_dir }}"
+vif_service: vif
+vif_conf_dir: "{{ __vif_conf_dir }}"
+vif_conf_file: "{{ __vif_conf_dir }}/vif.conf"
+vif_flags: ""

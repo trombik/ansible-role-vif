@@ -1,0 +1,6 @@
+---
+
+- name: Install vif
+  pkgng:
+    name: vif
+    state: present

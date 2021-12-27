@@ -1,0 +1,3 @@
+---
+__vif_db_dir: /var/db/vif
+__vif_conf_dir: /usr/local/etc/vif

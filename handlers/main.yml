@@ -1,0 +1,6 @@
+---
+
+- name: Restart vif
+  service:
+    name: vif
+    state: restarted
