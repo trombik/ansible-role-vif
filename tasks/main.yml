@@ -1,37 +1,26 @@
 ---
 # tasks file for ansible-role-vif
 
-- include_vars: "{{ ansible_os_family }}.yml"
+- name: "Include {{ ansible_os_family }}.yml"
+  include_vars: "{{ ansible_os_family }}.yml"
 
-- include: "install-{{ ansible_os_family }}.yml"
+- name: "Include install-{{ ansible_os_family }}.yml"
+  include: "install-{{ ansible_os_family }}.yml"
 
-- name: Create log directory
-  file:
-    path: "{{ vif_log_dir }}"
-    mode: 0755
-    owner: "{{ vif_user }}"
-    group: "{{ vif_group }}"
-    state: directory
-  notify: Restart vif
 
-- name: Create db directory
-  file:
-    path: "{{ vif_db_dir }}"
-    mode: 0755
-    owner: "{{ vif_user }}"
-    group: "{{ vif_group }}"
-    state: directory
-  notify: Restart vif
-
-- name: Create vif.conf
+- name: Create virtual interface file
   template:
-    src: vif.conf.j2
-    dest: "{{ vif_conf_file }}"
-    validate: echo %s
-  notify: Restart vif
+    src: hostname.if.j2
+    dest: "/etc/hostname.{{ item['name'] }}"
+    owner: root
+    group: wheel
+    mode: "0600"
+    validate: sh -n %s
+  register: __vif_create_virtual_interface_file
+  with_items: "{{ vif_config | sort(attribute='priority', reverse = True) }}"
 
-- name: Start vif
-  service:
-    name: "{{ vif_service }}"
-    enabled: true
-    state: started
+- name: Create virtual interfaces
+  ansible.builtin.command: "sh /etc/netstart {{ item['item']['name'] | quote }}"
+  with_items: "{{ __vif_create_virtual_interface_file['results'] }}"
+  when:
+    - item['changed']
